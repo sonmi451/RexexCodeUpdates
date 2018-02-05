@@ -1,0 +1,19 @@
+//Note the value in the Recruitment project field to reference later
+HRMRecruitingTable_RecruitmentProjectDetails_hrmRecruitingId_Copy = HRMRecruitingTableForm.RecruitmentProjectDetails_hrmRecruitingId().getValue();
+
+//Use the Quick Filter to find records. For example, filter on the Recruitment project field with a value of 'B01-000668'.
+HcmRecruitmentProjectsListPartForm.getStringEdit("QuickFilter").ApplyFilterForTaskRecorder(HcmRecruitmentProjectsListPart_QuickFilter_QuickFilter);
+//Expand the Contact information section.
+HcmWorkerForm1.getStringEdit("CommunicationTabPage").activate();HcmWorkerForm1.CommunicationTabPage().activate();
+
+//In the list, mark the selected row.
+CaseDetailForm2.getStringEdit("Grid").markActiveRow();CaseDetailForm2.Grid().markActiveRow();
+
+//In the Description field, type a value.
+HRMRecruitingTableForm.getStringEdit("RecruitmentProjectDetails_description").setValue(HRMRecruitingTable_RecruitmentProjectDetails_description);HRMRecruitingTableForm.RecruitmentProjectDetails_description().setValue(HRMRecruitingTable_RecruitmentProjectDetails_description);
+
+//In the Description field, type a value.
+LogisticsContactInfoGridForm.getStringEdit("ContactInfo_Description").setValue(LogisticsContactInfoGrid_ContactInfo_Description1);LogisticsContactInfoGridForm.ContactInfo_Description().setValue(LogisticsContactInfoGrid_ContactInfo_Description1);
+
+//Click New recruitment project.
+HcmRecruitmentWorkspaceForm.NewRecrutingProject().click();

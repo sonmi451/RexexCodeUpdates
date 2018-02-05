@@ -1,0 +1,145 @@
+
+[SysTestCaseDataDependencyAttribute("B01"),SysCodeGenAttribute()]
+class Create_case_category_create_and_complete_case extends SysTestCase
+{
+    protected FormAdaptor CaseCategorySetupForm;
+
+    protected str CaseCategorySetup_Identification_CaseCategory;
+
+    protected FormAdaptor CaseCategoryHierarchyDetail_ServiceLevelAgreementId_LookupForm;
+
+    protected FormAdaptor CaseDetailForm;
+
+    protected FormAdaptor CaseDetailCreateForm;
+
+    protected FormAdaptor CaseCategorySetupForm1;
+
+    protected str CaseCategorySetup_Identification_CaseCategory_Copy;
+
+    protected FormAdaptor CaseDetailForm2;
+
+    protected FormAdaptor CaseDetailCreateForm1;
+
+    protected str CaseDetailCreate_GeneralGroup_CaseId_Copy;
+
+    protected FormAdaptor CaseCategoryLookupForm;
+
+    protected int CaseDetail_CaseDetail_Status_Copy;
+
+    protected container CaseDetail_OverviewTabPage_OverviewTabPage;
+
+    protected container CaseDetail_QuickFilterControlOverview_QuickFilterControlOverview;
+
+    protected int CaseDetail_Grid_Status;
+
+    protected int CaseDetail_Grid_Status1;
+
+
+    public void SetUpTestCase()
+    {
+        super();
+        this.setupData();
+    }
+
+    [SysCodeGenAttribute()]
+    protected void setupData()
+    {
+        CaseCategorySetup_Identification_CaseCategory = "NewCaseCategory";
+        CaseDetail_OverviewTabPage_OverviewTabPage = ["true"];
+        CaseDetail_Grid_Status = 2;
+        CaseDetail_Grid_Status1 = 3;
+
+        //Filter to be redefined in script
+        CaseDetail_QuickFilterControlOverview_QuickFilterControlOverview = ["Case ID",CaseDetailCreate_GeneralGroup_CaseId_Copy,"{\"FieldName\":\"Grid_CaseId\",\"Value\":\""+CaseDetailCreate_GeneralGroup_CaseId_Copy+"\",\"Version\":2}","1"];
+
+    }
+
+    [SysCodeGenAttribute(),SysTestMethodAttribute()]
+    public void testMethod()
+    {
+        using (var c = ClientContext::create())
+        {
+            //Go to Organization administration > Setup > Cases > Case categories.
+            using (var c1 = c.navigate(menuItemDisplayStr(casecategorysetup),formStr(CaseCategorySetup),Microsoft.Dynamics.TestTools.Dispatcher.MenuItemType::Display))
+            {
+                CaseCategorySetupForm = c1.form();
+                //Click New.
+                CaseCategorySetupForm.systemDefinedNewButton().click();
+                //In the Case category field, type a value.
+                CaseCategorySetupForm.getStringEdit("Identification_CaseCategory").setValue(CaseCategorySetup_Identification_CaseCategory);
+                using (var c2 = c1.action("CaseCategoryHierarchyDetail_ServiceLevelAgreementId_RequestPopup"))
+                {
+                    //In the Service level agreement field, enter or select a value.
+                    CaseCategorySetupForm.getStringEdit("CaseCategoryHierarchyDetail_ServiceLevelAgreementId").openLookup();
+                    using (var c3 = c2.attachPrivate(""))
+                    {
+                        CaseCategoryHierarchyDetail_ServiceLevelAgreementId_LookupForm = c3.form();
+                        //In the list, click the link in the selected row.
+                        CaseCategoryHierarchyDetail_ServiceLevelAgreementId_LookupForm.getGrid("Grid").selectRecord();
+                    }
+                }
+                //Note the value in the Case category field to reference later
+                CaseCategorySetup_Identification_CaseCategory_Copy = CaseCategorySetupForm.getStringEdit("Identification_CaseCategory").getValue();
+                //Click Save.
+                CaseCategorySetupForm.systemDefinedSaveButton().click();
+                //Close the page.
+                CaseCategorySetupForm.close();
+            }
+            //Go to Common > Common > Cases > All cases.
+            using (var c9 = c.navigate(menuItemDisplayStr(caselistpage),formStr(CaseDetail),Microsoft.Dynamics.TestTools.Dispatcher.MenuItemType::Display))
+            {
+                CaseDetailForm2 = c9.form();
+                //Click New.
+                CaseDetailForm2.getMenuButton("NewButtonsMenu").click();
+                using (var c10 = c9.action("btnNewCase_Click"))
+                {
+                    //Click Case.
+                    CaseDetailForm2.getButton("btnNewCase").click();
+                    using (var c11 = c10.attach(formStr(CaseDetailCreate)))
+                    {
+                        CaseDetailCreateForm1 = c11.form();
+                        //In the Case category field, type a value.
+                        CaseDetailCreateForm1.getStringEdit("CaseCategoryHierarchyDetail_CaseCategory_CaseCategory").setValue(CaseCategorySetup_Identification_CaseCategory_Copy);
+                        //Note the value in the Case ID field to reference later
+                        CaseDetailCreate_GeneralGroup_CaseId_Copy = CaseDetailCreateForm1.getStringEdit("GeneralGroup_CaseId").getValue();
+                        //Redefine quickfilter
+                        CaseDetail_QuickFilterControlOverview_QuickFilterControlOverview = ["Case ID",CaseDetailCreate_GeneralGroup_CaseId_Copy,"{\"FieldName\":\"Grid_CaseId\",\"Value\":\""+CaseDetailCreate_GeneralGroup_CaseId_Copy+"\",\"Version\":2}","1"];
+                        //In the Case category field, type a value.
+                        CaseDetailCreateForm1.getStringEdit("CaseCategoryHierarchyDetail_CaseCategory_CaseCategory").setValue(CaseCategorySetup_Identification_CaseCategory_Copy);
+                        //Click Create.
+                        CaseDetailCreateForm1.getButton("OK").click();
+                    }
+                }
+                //Validate the value for Case ID matches the value copied in step 24.
+                this.assertEquals(CaseDetailCreate_GeneralGroup_CaseId_Copy,CaseDetailForm2.getStringEdit("IdentificationGroup_CaseId").getValue(),"Assertion failed for control IdentificationGroup_CaseId on form CaseDetail");
+                //Validate the value for Case category matches the value copied in step 18.
+                this.assertEquals(CaseCategorySetup_Identification_CaseCategory_Copy,CaseDetailForm2.getStringEdit("CaseCatHierarchyDetail_CaseCategory_CaseCategory").getValue(),"Assertion failed for control CaseCatHierarchyDetail_CaseCategory_CaseCategory on form CaseDetail");
+                //Note the value in the Status field to reference later
+                CaseDetail_CaseDetail_Status_Copy = CaseDetailForm2.getSelectableControl("CaseDetail_Status").getValue();
+                //Close the page.
+                CaseDetailForm2.getTabPage("OverviewTabPage").activate(conPeek(CaseDetail_OverviewTabPage_OverviewTabPage,1));
+                //Use the Quick Filter to find records. For example, filter on the Case ID field with a value of 'B01-001557'.
+                CaseDetailForm2.getQuickFilter("QuickFilterControlOverview").ApplyFilterForTaskRecorder(CaseDetail_QuickFilterControlOverview_QuickFilterControlOverview);
+                //In the list, mark the selected row.
+                CaseDetailForm2.getGrid("Grid").markActiveRow();
+                //Validate the value for Status matches the value copied in step 33.
+                this.assertEquals(CaseDetail_CaseDetail_Status_Copy,CaseDetailForm2.getSelectableControl("Grid_Status").getValue(),"Assertion failed for control Grid_Status on form CaseDetail");
+                //Click Change status.
+                CaseDetailForm2.getMenuButton("UpdateMenuButton").click();
+                //Click In process.
+                CaseDetailForm2.getButton("CaseUpdateStatus_InProcess").click();
+                //Validate that the value for Status is '2'.
+                this.assertEquals(CaseDetail_Grid_Status,CaseDetailForm2.getSelectableControl("Grid_Status").getValue(),"Assertion failed for control Grid_Status on form CaseDetail");
+                //Click Change status.
+                CaseDetailForm2.getMenuButton("UpdateMenuButton").click();
+                //Click Closed.
+                CaseDetailForm2.getButton("CaseUpdateStatus_Closed").click();
+                //Validate that the value for Status is '3'.
+                this.assertEquals(CaseDetail_Grid_Status1,CaseDetailForm2.getSelectableControl("Grid_Status").getValue(),"Assertion failed for control Grid_Status on form CaseDetail");
+                //Close the page.
+                CaseDetailForm2.close();
+            }
+        }
+    }
+
+}
